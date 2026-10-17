@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mujahid Enamelled Wire</title>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: sans-serif; margin: 0; background: #eef1f5; color: #1c1c1c; min-height: 100vh; }
+  .screen { max-width: 520px; margin: auto; padding: 16px; }
+  .hidden { display: none !important; }
+
+  /* Home */
+  .top { text-align: center; padding-top: 24px; }
+  .mono { display: none; width: 104px; height: 104px; margin: 0 auto; border-radius: 50%;
+          background: linear-gradient(135deg, #1f3a5f 0%, #2c5282 100%);
+          border: 5px solid #d62b2b; color: #fff; font-family: Georgia, serif; font-size: 56px; font-weight: bold;
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 8px 20px rgba(31,58,95,.35); }
+  h1 { color: #1f3a5f; font-size: 26px; margin: 16px 0 4px; }
+  .sub { color: #d62b2b; letter-spacing: 3px; font-size: 13px; text-transform: uppercase; margin-bottom: 30px; }
+  .option { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%;
+            background: #fff; border: 2px solid #dbe3ee; border-radius: 18px; padding: 22px 12px;
+            margin-bottom: 16px; box-shadow: 0 4px 12px rgba(31,58,95,.08);
+            font-size: 20px; font-weight: bold; color: #1f3a5f; font-family: sans-serif; }
+  .option svg { width: 72px; height: 72px; stroke: #1f3a5f; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .option small { font-weight: normal; font-size: 13px; color: #666; }
+
+  /* Professional header and footer */
+  .hero { background: linear-gradient(135deg, #1f3a5f 0%, #2c5282 100%); color: #fff; border-radius: 20px;
+          padding: 28px 18px 24px; text-align: center; margin-bottom: 26px;
+          box-shadow: 0 12px 26px rgba(31,58,95,.35); border-bottom: 5px solid #d62b2b; }
+  .hero h1 { color: #fff; font-size: 25px; margin: 0; letter-spacing: .5px; }
+  .hero .sub { color: #ffb3b3; font-size: 13px; letter-spacing: 4px; margin: 10px 0 0; font-weight: bold; }
+  .hero-line { width: 64px; height: 3px; background: #d62b2b; margin: 14px auto 12px; border-radius: 2px; }
+  .hero-note { font-size: 13px; opacity: .85; line-height: 1.4; }
+  .footer { text-align: center; color: #7a8699; font-size: 12px; margin: 10px 0 20px; letter-spacing: .5px; }
+  .footer b { color: #1f3a5f; }
+
+  /* Common */
+  .back { background: none; border: none; color: #1f3a5f; font-size: 16px; padding: 8px 0; margin: 0; width: auto; cursor: pointer; }
+  .btn { display: block; width: 100%; padding: 14px; margin-top: 12px; font-size: 17px; border: none; border-radius: 10px; background: #1f3a5f; color: #fff; }
+  .btn.alt { background: #fff; color: #1f3a5f; border: 2px solid #1f3a5f; }
+  .hint { text-align: center; color: #666; font-size: 14px; margin-top: 10px; min-height: 20px; }
+  .row-btns { display: flex; gap: 10px; }
+  .row-btns .btn { margin-top: 12px; }
+
+  /* Camera */
+  #reader { width: 100%; min-height: 320px; background: #000; border-radius: 14px; overflow: hidden; }
+
+  /* Manual */
+  .codein { width: 100%; padding: 14px; font-size: 20px; letter-spacing: 2px; border: 2px solid #1f3a5f; border-radius: 12px; margin-top: 10px; }
+  h2 { color: #1f3a5f; margin: 14px 0 0; font-size: 22px; }
+
+  /* Report */
+  .card { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  .card.ok { border: 2px solid #2e7d32; }
+  .card.fake { background: #fde2e2; border: 2px solid #c0392b; color: #7a1c12; }
+  .snap { width: 100%; border-radius: 8px; margin-bottom: 10px; display: block; }
+  .badge-ok, .badge-x { width: 78px; height: 78px; border-radius: 50%; color: #fff; font-size: 46px; font-weight: bold;
+                        text-align: center; line-height: 78px; margin: 4px auto 6px; }
+  .badge-ok { background: #2e7d32; box-shadow: 0 0 0 6px #e3f6e8; }
+  .badge-x { background: #d62b2b; box-shadow: 0 0 0 6px #fbd3d3; }
+  .card h2 { text-align: center; margin: 6px 0; }
+  .card.ok h2 { color: #2e7d32; font-size: 22px; }
+  .card.fake h2 { color: #c0392b; font-size: 24px; }
+  .label { font-size: 13px; color: #666; text-align: right; margin-top: 8px; }
+  .value { font-size: 17px; font-weight: bold; margin-bottom: 4px; text-align: right; overflow-wrap: anywhere; }
+  .value.net { font-size: 24px; color: #1f3a5f; background: #dbe7f5; padding: 8px 10px; border-radius: 8px; margin: 6px 0; }
+  ul { padding-left: 18px; margin: 6px 0; text-align: right; }
+  .blink { animation: blink 0.5s steps(2, start) 8; }
+  @keyframes blink { 0%, 100% { background: #fde2e2; } 50% { background: #e53935; color: #fff; } }
+  .blink h2 { animation: blinkText 0.5s steps(2, start) 8; }
+  @keyframes blinkText { 0%, 100% { color: #c0392b; } 50% { color: #fff; } }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home" class="screen">
+  <div class="top">
+    <div class="hero">
+      <h1>Mujahid Enamelled Wire</h1>
+      <div class="sub">VERIFICATION</div>
+      <div class="hero-line"></div>
+    </div>
+  </div>
+
+  <button class="option" onclick="openCamera()">
+    <svg viewBox="0 0 64 64">
+      <path d="M8 22V12a4 4 0 0 1 4-4h10"/>
+      <path d="M42 8h10a4 4 0 0 1 4 4v10"/>
+      <path d="M56 42v10a4 4 0 0 1-4 4H42"/>
+      <path d="M22 56H12a4 4 0 0 1-4-4V42"/>
+      <path d="M14 32h36"/>
+    </svg>
+    <span>Camera scanning</span>
+    <small>Scan the label with the camera</small>
+  </button>
+
+  <button class="option" onclick="openManual()">
+    <svg viewBox="0 0 64 64">
+      <rect x="8" y="16" width="48" height="32" rx="4"/>
+      <path d="M16 26h4"/><path d="M26 26h4"/><path d="M36 26h4"/><path d="M46 26h2"/>
+      <path d="M16 36h32"/>
+    </svg>
+    <span>Manual entry</span>
+    <small>Type the 30-digit code</small>
+  </button>
+
+  <div class="footer"><b>Mujahid Enamelled Wire</b><br>Quality verification system</div>
+</section>
+
+<!-- CAMERA -->
+<section id="camera" class="screen hidden">
+  <button class="back" onclick="goHome()">&larr; Back</button>
+  <div id="reader"></div>
+  <div id="camStatus" class="hint"></div>
+  <button class="btn alt" onclick="pickGallery()">Pick from gallery</button>
+  <input type="file" id="galleryInput" accept="image/*" style="display:none">
+</section>
+
+<!-- MANUAL -->
+<section id="manual" class="screen hidden">
+  <button class="back" onclick="goHome()">&larr; Back</button>
+  <h2>Enter 30-digit code</h2>
+  <input id="manualCode" class="codein" type="text" inputmode="numeric" maxlength="30" placeholder="30 digits">
+  <button class="btn" onclick="checkManual()">Check</button>
+</section>
+
+<!-- RESULT -->
+<section id="result" class="screen hidden">
+  <div id="resultBox"></div>
+</section>
+
+<script>
+// ===== Master data =====
+const PRODUCTS = {
+  '01': 'Mujahid enamelled wire',
+  '02': 'Muslim enamelled wire'
+};
+const SUPERVISORS = {
+  '01': 'Mr Sageer', '02': 'Saif Khan', '03': 'Nadeem Baig', '04': 'Mr Ramzan',
+  '05': 'Jamel ur Rehman', '06': 'Jutt', '07': 'Mr Asger', '08': 'Mr Jameel'
+};
+const ENAMELS = {
+  '01': 'Black Class F 155c°',
+  '02': 'Golden Class F'
+};
+const FORMULATIONS = {
+  '01': 'Taiwan {TW} F (155-175)c° -1',
+  '02': 'Taiwan {TW} Golden -2',
+  '03': 'Taiwan {TW} F(155-175)c° -3',
+  '04': 'Germany {DE} class F -4'
+};
+
+// Small flag icons (SVG)
+const FLAGS = {
+  TW: '<svg width="20" height="14" viewBox="0 0 30 20" style="vertical-align:middle;border:1px solid #ccc;border-radius:2px"><rect width="30" height="20" fill="#fe0000"/><rect width="15" height="10" fill="#000095"/><circle cx="7.5" cy="5" r="3" fill="#fff"/></svg>',
+  DE: '<svg width="20" height="14" viewBox="0 0 5 3" style="vertical-align:middle;border:1px solid #ccc;border-radius:2px"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#d00"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg>'
+};
+function flagify(s) { return s.replace(/\{(TW|DE)\}/g, (m, c) => FLAGS[c]); }
+
+// ===== Sounds =====
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function tone(freq, start, dur, type, vol) {
+  const ac = getAudio();
+  const o = ac.createOscillator();
+  const g = ac.createGain();
+  const t = ac.currentTime + start;
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g); g.connect(ac.destination);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+function shutterSound() {
+  const ac = getAudio();
+  const len = Math.floor(ac.sampleRate * 0.08);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  const src = ac.createBufferSource();
+  const g = ac.createGain();
+  g.gain.value = 0.6;
+  src.buffer = buf; src.connect(g); g.connect(ac.destination);
+  src.start();
+}
+function successSound() { tone(880, 0, 0.15, 'sine', 0.3); tone(1320, 0.16, 0.25, 'sine', 0.3); }
+function failSound() { tone(1000, 0, 0.3, 'triangle', 0.35); tone(1000, 0.4, 0.3, 'triangle', 0.35); }
+
+// ===== Snapshot from camera =====
+function takeSnapshot() {
+  const v = document.querySelector('#reader video');
+  if (!v || !v.videoWidth) return null;
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.85);
+}
+
+// ===== Decode and verify =====
+function luhnValid(code) {
+  let total = 0;
+  for (let i = 0; i < code.length; i++) {
+    let d = parseInt(code[code.length - 1 - i], 10);
+    if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; }
+    total += d;
+  }
+  return total % 10 === 0;
+}
+function decodeSwg(three) {
+  const n = parseInt(three, 10);
+  return n % 10 === 0 ? String(n / 10) : (n / 10).toFixed(1);
+}
+function formatDate(yymmdd) {
+  const yy = parseInt(yymmdd.slice(0, 2), 10);
+  const mm = parseInt(yymmdd.slice(2, 4), 10);
+  const dd = parseInt(yymmdd.slice(4, 6), 10);
+  return { mm, dd, text: `${String(dd).padStart(2,'0')}-${String(mm).padStart(2,'0')}-${2000 + yy}` };
+}
+function checkCode(raw) {
+  const code = String(raw).trim();
+  const problems = [];
+  if (!/^\d{30}$/.test(code)) return { ok: false, problems: ['Barcode is not exactly 30 digits'] };
+  if (!luhnValid(code)) problems.push('Check digit is invalid');
+
+  const productCode = code.slice(0, 2);
+  const swgRaw = code.slice(2, 5);
+  const enamelCode = code.slice(5, 7);
+  const formCode = code.slice(7, 9);
+  const supCode = code.slice(9, 11);
+  const dateRaw = code.slice(11, 17);
+  const netRaw = code.slice(17, 22);
+  const spoolRaw = code.slice(22, 25);
+
+  if (!PRODUCTS[productCode]) problems.push('Product code not in master list');
+  if (!ENAMELS[enamelCode]) problems.push('Enamel code not in master list');
+  if (!FORMULATIONS[formCode]) problems.push('Formulation code not in master list');
+  if (!SUPERVISORS[supCode]) problems.push('Supervisor code not in master list');
+
+  const d = formatDate(dateRaw);
+  if (d.mm < 1 || d.mm > 12 || d.dd < 1 || d.dd > 31) problems.push('Date is invalid');
+
+  const swg = parseInt(swgRaw, 10);
+  if (swg < 10 || swg > 999) problems.push('SWG value is invalid');
+
+  const netG = parseInt(netRaw, 10);
+  if (netG <= 0) problems.push('Net weight is invalid');
+
+  if (problems.length) return { ok: false, problems };
+
+  const spoolG = parseInt(spoolRaw, 10);
+  return {
+    ok: true,
+    details: {
+      'Product': PRODUCTS[productCode],
+      'SWG': decodeSwg(swgRaw),
+      'Enamel type': ENAMELS[enamelCode],
+      'Formulation': FORMULATIONS[formCode],
+      'Supervisor': SUPERVISORS[supCode],
+      'Date of manufacture': d.text,
+      'Spool weight': spoolG + ' g',
+      'Gross weight': ((netG + spoolG) / 1000).toFixed(3) + ' kg',
+      'Net weight': (netG / 1000).toFixed(3) + ' kg'
+    }
+  };
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ===== Screens =====
+function showScreen(id) {
+  ['home', 'camera', 'manual', 'result'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+function goHome() {
+  stopCamera();
+  lastCode = null;
+  document.getElementById('camStatus').textContent = '';
+  showScreen('home');
+}
+function openManual() {
+  document.getElementById('manualCode').value = '';
+  showScreen('manual');
+}
+
+// ===== Show result =====
+function showResult(raw, previewUrl, fromCamera) {
+  if (fromCamera) shutterSound();
+  const snap = previewUrl || (fromCamera ? takeSnapshot() : null);
+  const imgHtml = snap ? `<img class="snap" src="${snap}" alt="Scanned label">` : '';
+  const r = checkCode(raw);
+
+  stopCamera();
+  const box = document.getElementById('resultBox');
+  const buttons = `
+    <div class="row-btns">
+      <button class="btn" onclick="openCamera()">Scan again</button>
+      <button class="btn alt" onclick="goHome()">Home</button>
+    </div>`;
+
+  if (!r.ok) {
+    box.innerHTML = `
+      <div class="card fake blink">
+        ${imgHtml}
+        <div class="badge-x">&#10005;</div>
+        <h2>Fake product</h2>
+        <ul>${r.problems.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+        ${buttons}
+      </div>`;
+    setTimeout(failSound, 250);
+  } else {
+    let rows = '';
+    for (const [k, v] of Object.entries(r.details)) {
+      const cls = k === 'Net weight' ? 'value net' : 'value';
+      rows += `<div class="label">${esc(k)}</div><div class="${cls}">${flagify(esc(v))}</div>`;
+    }
+    box.innerHTML = `
+      <div class="card ok">
+        ${imgHtml}
+        <div class="badge-ok">&#10003;</div>
+        <h2>Verified product</h2>
+        ${rows}
+        ${buttons}
+      </div>`;
+    setTimeout(successSound, 250);
+  }
+  showScreen('result');
+}
+
+// ===== Camera =====
+let scanner = null;
+let running = false;
+let lastCode = null;
+let lastTime = 0;
+
+function onScan(text) {
+  const now = Date.now();
+  if (text === lastCode && now - lastTime < 3000) return;
+  lastCode = text;
+  lastTime = now;
+  showResult(text, null, true);
+}
+
+async function openCamera() {
+  getAudio();
+  lastCode = null;
+  document.getElementById('camStatus').textContent = 'Point the camera at the label';
+  showScreen('camera');
+  await startCamera();
+}
+
+async function startCamera() {
+  if (!scanner) {
+    scanner = new Html5Qrcode('reader', {
+      formatsToSupport: [ Html5QrcodeSupportedFormats.DATA_MATRIX, Html5QrcodeSupportedFormats.QR_CODE ],
+      verbose: false
+    });
+  }
+  if (running) return;
+  try {
+    await scanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 260, height: 260 } },
+      onScan,
+      () => {}
+    );
+    running = true;
+  } catch (e) {
+    document.getElementById('camStatus').textContent = 'Camera could not be opened. Allow camera access and try again.';
+  }
+}
+
+async function stopCamera() {
+  if (running && scanner) {
+    try { await scanner.stop(); } catch (e) {}
+    running = false;
+  }
+}
+
+// ===== Gallery =====
+function pickGallery() {
+  document.getElementById('galleryInput').click();
+}
+document.getElementById('galleryInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const fr = new FileReader();
+  fr.onload = async () => {
+    await stopCamera();
+    try {
+      const fileScanner = new Html5Qrcode('reader');
+      const text = await fileScanner.scanFile(file, false);
+      showResult(text, fr.result, false);
+    } catch (err) {
+      document.getElementById('camStatus').textContent = 'No barcode found in this photo. Try a clearer picture.';
+    }
+    e.target.value = '';
+  };
+  fr.readAsDataURL(file);
+});
+
+// ===== Manual =====
+function checkManual() {
+  const v = document.getElementById('manualCode').value.replace(/\s+/g, '');
+  if (!v) return;
+  showResult(v, null, false);
+}
+document.getElementById('manualCode').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkManual();
+});
+
+let lastCodeGuard = null; // kept for compatibility
+</script>
+</body>
+</html>
