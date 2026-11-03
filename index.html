@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1f3a5f">
 <title>Mujahid Enamelled Wire</title>
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   body { font-family: sans-serif; margin: 0; background: #eef1f5; color: #1c1c1c; min-height: 100vh; }
@@ -13,17 +13,11 @@
 
   /* Home */
   .top { text-align: center; padding-top: 24px; }
-  .mono { display: none; width: 104px; height: 104px; margin: 0 auto; border-radius: 50%;
-          background: linear-gradient(135deg, #1f3a5f 0%, #2c5282 100%);
-          border: 5px solid #d62b2b; color: #fff; font-family: Georgia, serif; font-size: 56px; font-weight: bold;
-          display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 8px 20px rgba(31,58,95,.35); }
   h1 { color: #1f3a5f; font-size: 26px; margin: 16px 0 4px; }
-  .sub { color: #d62b2b; letter-spacing: 3px; font-size: 13px; text-transform: uppercase; margin-bottom: 30px; }
   .option { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%;
             background: #fff; border: 2px solid #dbe3ee; border-radius: 18px; padding: 22px 12px;
             margin-bottom: 16px; box-shadow: 0 4px 12px rgba(31,58,95,.08);
-            font-size: 20px; font-weight: bold; color: #1f3a5f; font-family: sans-serif; }
+            font-size: 20px; font-weight: bold; color: #1f3a5f; font-family: sans-serif; cursor: pointer; }
   .option svg { width: 72px; height: 72px; stroke: #1f3a5f; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
   .option small { font-weight: normal; font-size: 13px; color: #666; }
 
@@ -34,20 +28,20 @@
   .hero h1 { color: #fff; font-size: 25px; margin: 0; letter-spacing: .5px; }
   .hero .sub { color: #ffb3b3; font-size: 13px; letter-spacing: 4px; margin: 10px 0 0; font-weight: bold; }
   .hero-line { width: 64px; height: 3px; background: #d62b2b; margin: 14px auto 12px; border-radius: 2px; }
-  .hero-note { font-size: 13px; opacity: .85; line-height: 1.4; }
   .footer { text-align: center; color: #7a8699; font-size: 12px; margin: 10px 0 20px; letter-spacing: .5px; }
   .footer b { color: #1f3a5f; }
 
   /* Common */
   .back { background: none; border: none; color: #1f3a5f; font-size: 16px; padding: 8px 0; margin: 0; width: auto; cursor: pointer; }
-  .btn { display: block; width: 100%; padding: 14px; margin-top: 12px; font-size: 17px; border: none; border-radius: 10px; background: #1f3a5f; color: #fff; }
+  .btn { display: block; width: 100%; padding: 14px; margin-top: 12px; font-size: 17px; border: none; border-radius: 10px; background: #1f3a5f; color: #fff; cursor: pointer; }
   .btn.alt { background: #fff; color: #1f3a5f; border: 2px solid #1f3a5f; }
-  .hint { text-align: center; color: #666; font-size: 14px; margin-top: 10px; min-height: 20px; }
+  .hint { text-align: center; color: #666; font-size: 14px; margin-top: 10px; min-height: 20px; line-height: 1.5; }
   .row-btns { display: flex; gap: 10px; }
   .row-btns .btn { margin-top: 12px; }
 
   /* Camera */
   #reader { width: 100%; min-height: 320px; background: #000; border-radius: 14px; overflow: hidden; }
+  #reader video { width: 100%; display: block; }
 
   /* Manual */
   .codein { width: 100%; padding: 14px; font-size: 20px; letter-spacing: 2px; border: 2px solid #1f3a5f; border-radius: 12px; margin-top: 10px; }
@@ -65,10 +59,10 @@
   .card h2 { text-align: center; margin: 6px 0; }
   .card.ok h2 { color: #2e7d32; font-size: 22px; }
   .card.fake h2 { color: #c0392b; font-size: 24px; }
-  .label { font-size: 13px; color: #666; text-align: right; margin-top: 8px; }
-  .value { font-size: 17px; font-weight: bold; margin-bottom: 4px; text-align: right; overflow-wrap: anywhere; }
+  .label { font-size: 13px; color: #666; text-align: left; margin-top: 8px; }
+  .value { font-size: 17px; font-weight: bold; margin-bottom: 4px; text-align: left; overflow-wrap: anywhere; }
   .value.net { font-size: 24px; color: #1f3a5f; background: #dbe7f5; padding: 8px 10px; border-radius: 8px; margin: 6px 0; }
-  ul { padding-left: 18px; margin: 6px 0; text-align: right; }
+  ul { padding-left: 18px; margin: 6px 0; text-align: left; }
   .blink { animation: blink 0.5s steps(2, start) 8; }
   @keyframes blink { 0%, 100% { background: #fde2e2; } 50% { background: #e53935; color: #fff; } }
   .blink h2 { animation: blinkText 0.5s steps(2, start) 8; }
@@ -134,6 +128,9 @@
   <div id="resultBox"></div>
 </section>
 
+<!-- Used only if this phone's browser has no built-in barcode reader -->
+<div id="scanHost" style="display:none"></div>
+
 <script>
 // ===== Master data =====
 const PRODUCTS = {
@@ -145,24 +142,29 @@ const SUPERVISORS = {
   '05': 'Jamel ur Rehman', '06': 'Jutt', '07': 'Mr Asger', '08': 'Mr Jameel'
 };
 const ENAMELS = {
-  '01': 'Black Class F 155c°',
-  '02': 'Golden Class F'
+  '01': 'Polyester (Black) Class F',
+  '02': 'Polyurethane (Golden)'
 };
 const FORMULATIONS = {
-  '01': 'Taiwan {TW} F (155-175)c° -1',
-  '02': 'Taiwan {TW} Golden -2',
-  '03': 'Taiwan {TW} F(155-175)c° -3',
-  '04': 'Germany {DE} class F -4'
+  '01': 'Made in Taiwan {TW} (170-155)c° -1',
+  '02': 'Made in Taiwan {TW} (170-155)c° -2',
+  '03': 'Made in Taiwan {TW} (170-155)c° -3',
+  '04': 'Made in Germany {DE} (170-155)c° -4',
+  '05': 'Made in Taiwan {TW} (170-155)c° -5',
+  '06': 'Made in Taiwan {TW} (170-155)c° -6',
+  '07': 'Made in Taiwan {TW} Golden -7',
+  '08': 'Made in Taiwan {TW} Golden -8',
+  '09': 'Made in Taiwan {TW} Golden -9'
 };
 
-// Small flag icons (SVG)
+// Small flag icons (SVG, work offline)
 const FLAGS = {
   TW: '<svg width="20" height="14" viewBox="0 0 30 20" style="vertical-align:middle;border:1px solid #ccc;border-radius:2px"><rect width="30" height="20" fill="#fe0000"/><rect width="15" height="10" fill="#000095"/><circle cx="7.5" cy="5" r="3" fill="#fff"/></svg>',
   DE: '<svg width="20" height="14" viewBox="0 0 5 3" style="vertical-align:middle;border:1px solid #ccc;border-radius:2px"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#d00"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg>'
 };
 function flagify(s) { return s.replace(/\{(TW|DE)\}/g, (m, c) => FLAGS[c]); }
 
-// ===== Sounds =====
+// ===== Sounds (generated in the browser, work offline) =====
 let audioCtx = null;
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -195,16 +197,6 @@ function shutterSound() {
 }
 function successSound() { tone(880, 0, 0.15, 'sine', 0.3); tone(1320, 0.16, 0.25, 'sine', 0.3); }
 function failSound() { tone(1000, 0, 0.3, 'triangle', 0.35); tone(1000, 0.4, 0.3, 'triangle', 0.35); }
-
-// ===== Snapshot from camera =====
-function takeSnapshot() {
-  const v = document.querySelector('#reader video');
-  if (!v || !v.videoWidth) return null;
-  const c = document.createElement('canvas');
-  c.width = v.videoWidth; c.height = v.videoHeight;
-  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-  return c.toDataURL('image/jpeg', 0.85);
-}
 
 // ===== Decode and verify =====
 function luhnValid(code) {
@@ -264,7 +256,7 @@ function checkCode(raw) {
       'Product': PRODUCTS[productCode],
       'SWG': decodeSwg(swgRaw),
       'Enamel type': ENAMELS[enamelCode],
-      'Formulation': FORMULATIONS[formCode],
+      'Enamel formulation': FORMULATIONS[formCode],
       'Supervisor': SUPERVISORS[supCode],
       'Date of manufacture': d.text,
       'Spool weight': spoolG + ' g',
@@ -283,10 +275,13 @@ function showScreen(id) {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
+function setStatus(msg) {
+  document.getElementById('camStatus').textContent = msg;
+}
 function goHome() {
   stopCamera();
   lastCode = null;
-  document.getElementById('camStatus').textContent = '';
+  setStatus('');
   showScreen('home');
 }
 function openManual() {
@@ -338,13 +333,92 @@ function showResult(raw, previewUrl, fromCamera) {
   showScreen('result');
 }
 
-// ===== Camera =====
-let scanner = null;
+// ===== Barcode reading =====
+// Main reader: the browser's built-in BarcodeDetector (Chrome on Android).
+// It works without internet. Fallback: html5-qrcode, loaded only if needed.
+const FORMATS = ['data_matrix', 'qr_code'];
+const hasNative = typeof window.BarcodeDetector !== 'undefined';
+
 let running = false;
+let stream = null;
+let video = null;
+let detector = null;
+let scanTimer = null;
+let busy = false;
+let scanner = null;
 let lastCode = null;
 let lastTime = 0;
 
+function loadFallback() {
+  if (window.Html5Qrcode) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('offline'));
+    document.head.appendChild(s);
+  });
+}
+
+function cameraError(e) {
+  if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
+    return 'Camera permission is blocked. Tap the lock icon near the address bar, set Camera to Allow, then reload the page.';
+  }
+  if (e && e.name === 'NotFoundError') return 'No camera was found on this device.';
+  if (e && e.message === 'offline') return 'This browser needs internet for its camera reader. Use manual entry, or pick a photo from the gallery.';
+  return 'Camera could not be opened. Please try again.';
+}
+
+async function startNative() {
+  const reader = document.getElementById('reader');
+  reader.innerHTML = '';
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' } },
+    audio: false
+  });
+  const v = document.createElement('video');
+  v.setAttribute('playsinline', '');
+  v.muted = true;
+  v.autoplay = true;
+  v.srcObject = stream;
+  reader.appendChild(v);
+  await v.play();
+  video = v;
+  detector = new BarcodeDetector({ formats: FORMATS });
+  scanTimer = setInterval(scanFrame, 150);
+}
+
+async function scanFrame() {
+  if (busy || !running || !video || video.readyState < 2) return;
+  busy = true;
+  try {
+    const codes = await detector.detect(video);
+    if (codes.length && running) onScan(codes[0].rawValue);
+  } catch (e) {
+    // ignore single-frame errors and keep scanning
+  } finally {
+    busy = false;
+  }
+}
+
+async function startFallback() {
+  await loadFallback();
+  const reader = document.getElementById('reader');
+  reader.innerHTML = '';
+  scanner = new Html5Qrcode('reader', {
+    formatsToSupport: [ Html5QrcodeSupportedFormats.DATA_MATRIX, Html5QrcodeSupportedFormats.QR_CODE ],
+    verbose: false
+  });
+  await scanner.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: { width: 260, height: 260 } },
+    text => onScan(text),
+    () => {}
+  );
+}
+
 function onScan(text) {
+  if (!running) return;
   const now = Date.now();
   if (text === lastCode && now - lastTime < 3000) return;
   lastCode = text;
@@ -355,43 +429,62 @@ function onScan(text) {
 async function openCamera() {
   getAudio();
   lastCode = null;
-  document.getElementById('camStatus').textContent = 'Point the camera at the label';
+  setStatus('Point the camera at the label');
   showScreen('camera');
   await startCamera();
 }
 
 async function startCamera() {
-  if (!scanner) {
-    scanner = new Html5Qrcode('reader', {
-      formatsToSupport: [ Html5QrcodeSupportedFormats.DATA_MATRIX, Html5QrcodeSupportedFormats.QR_CODE ],
-      verbose: false
-    });
-  }
   if (running) return;
   try {
-    await scanner.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 260, height: 260 } },
-      onScan,
-      () => {}
-    );
+    if (hasNative) await startNative(); else await startFallback();
     running = true;
+    setStatus('Point the camera at the label');
   } catch (e) {
-    document.getElementById('camStatus').textContent = 'Camera could not be opened. Allow camera access and try again.';
+    setStatus(cameraError(e));
   }
 }
 
 async function stopCamera() {
-  if (running && scanner) {
+  running = false;
+  if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  video = null;
+  if (scanner) {
     try { await scanner.stop(); } catch (e) {}
-    running = false;
+    scanner = null;
   }
+  document.getElementById('reader').innerHTML = '';
+}
+
+// Snapshot of the live camera frame (used in the report)
+function takeSnapshot() {
+  const v = document.querySelector('#reader video');
+  if (!v || !v.videoWidth) return null;
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth;
+  c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.85);
 }
 
 // ===== Gallery =====
 function pickGallery() {
   document.getElementById('galleryInput').click();
 }
+
+async function decodeImage(file) {
+  if (hasNative) {
+    const bmp = await createImageBitmap(file);
+    const det = new BarcodeDetector({ formats: FORMATS });
+    const codes = await det.detect(bmp);
+    return codes.length ? codes[0].rawValue : null;
+  }
+  await loadFallback();
+  const fs = new Html5Qrcode('scanHost');
+  return await fs.scanFile(file, false);
+}
+
 document.getElementById('galleryInput').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -399,11 +492,14 @@ document.getElementById('galleryInput').addEventListener('change', e => {
   fr.onload = async () => {
     await stopCamera();
     try {
-      const fileScanner = new Html5Qrcode('reader');
-      const text = await fileScanner.scanFile(file, false);
+      const text = await decodeImage(file);
+      if (!text) throw new Error('none');
       showResult(text, fr.result, false);
     } catch (err) {
-      document.getElementById('camStatus').textContent = 'No barcode found in this photo. Try a clearer picture.';
+      showScreen('camera');
+      setStatus(err.message === 'offline'
+        ? cameraError(err)
+        : 'No barcode found in this photo. Try a clearer, closer picture.');
     }
     e.target.value = '';
   };
@@ -420,7 +516,10 @@ document.getElementById('manualCode').addEventListener('keydown', e => {
   if (e.key === 'Enter') checkManual();
 });
 
-let lastCodeGuard = null; // kept for compatibility
+// ===== Offline support =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
