@@ -47,6 +47,16 @@
   .codein { width: 100%; padding: 14px; font-size: 20px; letter-spacing: 2px; border: 2px solid #1f3a5f; border-radius: 12px; margin-top: 10px; }
   h2 { color: #1f3a5f; margin: 14px 0 0; font-size: 22px; }
 
+  /* Golden word highlight */
+  .gold {
+    color: #000000;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    background: #fee46b;
+    padding: 0 6px;
+    border-radius: 4px;
+  }
+
   /* Report */
   .card { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
   .card.ok { border: 2px solid #2e7d32; }
@@ -170,6 +180,8 @@ const FLAGS = {
   DE: '<svg width="20" height="14" viewBox="0 0 5 3" style="vertical-align:middle;border:1px solid #ccc;border-radius:2px"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#d00"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg>'
 };
 function flagify(s) { return s.replace(/\{(TW|DE)\}/g, (m, c) => FLAGS[c]); }
+// Only the word "Golden" gets the gold highlight; the rest of the text stays as it is
+function goldify(s) { return s.replace(/Golden/g, '<span class="gold">Golden</span>'); }
 
 // ===== Sounds (generated in the browser, work offline) =====
 let audioCtx = null;
@@ -325,7 +337,7 @@ function showResult(raw, previewUrl, fromCamera) {
     let rows = '';
     for (const [k, v] of Object.entries(r.details)) {
       const cls = k === 'Net weight' ? 'value net' : 'value';
-      rows += `<div class="label">${esc(k)}</div><div class="${cls}">${flagify(esc(v))}</div>`;
+      rows += `<div class="label">${esc(k)}</div><div class="${cls}">${goldify(flagify(esc(v)))}</div>`;
     }
     box.innerHTML = `
       <div class="card ok">
