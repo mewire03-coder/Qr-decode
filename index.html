@@ -121,6 +121,7 @@
   <button class="back" onclick="goHome()">&larr; Back</button>
   <div id="reader"></div>
   <div id="camStatus" class="hint"></div>
+  <button id="torchBtn" class="btn alt" style="display:none" onclick="toggleTorch()">Flashlight on</button>
   <button class="btn alt" onclick="pickGallery()">Pick from gallery</button>
   <input type="file" id="galleryInput" accept="image/*" style="display:none">
 </section>
@@ -403,6 +404,7 @@ async function startNative() {
   reader.appendChild(v);
   await v.play();
   video = v;
+  setupTorch();
   detector = new BarcodeDetector({ formats: FORMATS });
   scanTimer = setInterval(scanFrame, 150);
 }
@@ -469,11 +471,43 @@ async function stopCamera() {
   if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
   if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
   video = null;
+  torchOn = false;
+  document.getElementById('torchBtn').style.display = 'none';
   if (scanner) {
     try { await scanner.stop(); } catch (e) {}
     scanner = null;
   }
   document.getElementById('reader').innerHTML = '';
+}
+
+// ===== Flashlight (torch) =====
+// Works on Chrome for Android when the phone camera supports it.
+// Hidden automatically when the device does not support it.
+let torchOn = false;
+function setupTorch() {
+  const btn = document.getElementById('torchBtn');
+  btn.style.display = 'none';
+  torchOn = false;
+  if (!stream) return;
+  const track = stream.getVideoTracks()[0];
+  const caps = track && track.getCapabilities ? track.getCapabilities() : {};
+  if (caps.torch) {
+    btn.style.display = 'block';
+    btn.textContent = 'Flashlight on';
+  }
+}
+async function toggleTorch() {
+  if (!stream) return;
+  const track = stream.getVideoTracks()[0];
+  try {
+    torchOn = !torchOn;
+    await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+    document.getElementById('torchBtn').textContent = torchOn ? 'Flashlight off' : 'Flashlight on';
+  } catch (e) {
+    torchOn = false;
+    document.getElementById('torchBtn').style.display = 'none';
+    setStatus('Flashlight is not available on this device.');
+  }
 }
 
 // Snapshot of the live camera frame (used in the report)
