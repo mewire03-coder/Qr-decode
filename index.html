@@ -167,10 +167,10 @@ const FORMULATIONS = {
   '08': 'Made in Taiwan {TW} (170-155)c°',
   '09': 'Made in Taiwan {TW} (170-155)c°',
   '10': 'Made in Taiwan {TW} (170-155)c°',
-  '11': 'Made in Taiwan {TW} Golden',
+  '11': 'Made in Germany {DE} Golden',
   '12': 'Made in Taiwan {TW} Golden',
   '13': 'Made in Taiwan {TW} Golden',
-  '14': 'Made in Taiwan {TW} Golden',
+  '14': 'Made in Germany {DE} Golden',
   '15': 'Made in Taiwan {TW} Golden'
 };
 
@@ -275,7 +275,7 @@ function checkCode(raw) {
       'Product': PRODUCTS[productCode],
       'SWG': decodeSwg(swgRaw),
       'Enamel type': ENAMELS[enamelCode],
-      'Enamel formulation': FORMULATIONS[formCode],
+      'Enamel formulation': FORMULATIONS[formCode] + ' •' + formCode,
       'Supervisor': SUPERVISORS[supCode],
       'Date of manufacture': d.text,
       'Spool weight': spoolG + ' g',
